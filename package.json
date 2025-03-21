@@ -1,0 +1,25 @@
+{
+  "name": "retro-routes-auth-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon ./src/server.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.13.0",
+    "@grpc/proto-loader": "^0.7.13",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/node": "^22.13.11",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
+  }
+}
