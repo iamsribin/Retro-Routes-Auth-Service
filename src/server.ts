@@ -28,7 +28,6 @@ const server = new grpc.Server();
 
 server.addService(authpackage.Auth.service,{
 VerifyToken:authcontroller.verifyToken,
-RefreshToken:authcontroller.isAuthenticated
 });
 
 const grpcServer = () =>{
