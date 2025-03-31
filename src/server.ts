@@ -27,8 +27,8 @@ if(!authpackage || !authpackage.Auth || !authpackage.Auth.service){
 const server = new grpc.Server();
 
 server.addService(authpackage.Auth.service,{
-VerifyToken:authcontroller.verifyToken,
-RefreshToken:authcontroller.isAuthenticated
+IsAuthenticated : authcontroller.isAuthenticated,   
+RefreshToken: authcontroller.verifyToken
 });
 
 const grpcServer = () =>{
