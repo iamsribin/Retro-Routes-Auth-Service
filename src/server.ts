@@ -3,9 +3,9 @@ import * as grpc from "@grpc/grpc-js";
 import * as protoLoader from "@grpc/proto-loader";
 import "dotenv/config"
 
-import { Authcontroller } from "./controller/auth-countroller";
+import {AuthController}  from "./controller/auth-countroller";
 
-const authcontroller = new Authcontroller();
+const authcontroller = new AuthController();
 
 const packageDef = protoLoader.loadSync(path.resolve(__dirname,"./proto/auth.proto"),{
   keepCase: true,

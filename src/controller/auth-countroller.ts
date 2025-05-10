@@ -1,51 +1,91 @@
-import jwt, { Secret } from 'jsonwebtoken'
-import "dotenv/config"
+import jwt, { Secret } from "jsonwebtoken";
+import "dotenv/config";
 
-export class Authcontroller {
+interface DecodedToken {
+  clientId: string;
+  role: string;
+}
 
-    isAuthenticated = async(call:any, callback:any)=>{
-        try{
-            console.log("token validating...");
-            const token = call.request.token || '';  
-                        
-            const decoded: any = jwt.verify(token, process.env.ACCESS_TOKEN || "sribin" as Secret);
+export class AuthController {
+  isAuthenticated = async (call: any, callback: any) => {
+    try {
+      const { token, requiredRole } = call.request;
+      console.log(token, requiredRole);
 
-            if(!decoded){
-                throw new Error('Invalid token')
-            }
-            
-            callback(null,{userId : decoded.id, role: decoded.role})
-        }catch(e: any){
-            console.log(e);
-            
-            callback(e, {message:"something gone wrong in authentication"})
-         }
+      if (!token) {
+        return callback(null, { message: "No token provided" });
+      }
+
+      const decoded = jwt.verify(
+        token,
+        process.env.ACCESS_TOKEN || "retro-routes"
+      ) as DecodedToken;
+
+      if (!decoded || !decoded.role) {
+        return callback(null, { message: "Invalid token" });
+      }
+      console.log(decoded.role ,"!==", requiredRole);
+
+      if (decoded.role !== requiredRole) {
+        return callback(null, {
+          message: `Access denied: ${requiredRole} role required`,
+        });
+      }
+
+      callback(null, {
+        userId: decoded.clientId,
+        role: decoded.role,
+        message: "",
+      });
+    } catch (error: any) {
+      console.log("Token verification failed:", error.message);
+      callback(null, { message: "Unauthorized" });
     }
+  };
 
-    verifyToken = async(call:any, callback:any) => {
-        try{
-            console.log("veryfing token...");
-            
-            const refreshtoken = call.request.token as string;
-            const decoded: any = jwt.verify(refreshtoken, process.env.REFRESH_TOKEN ||"sribin" as Secret);
+  verifyToken = async (call: any, callback: any) => {
+    try {
+      console.log("verifyToken calling...");
+      
+      const refreshToken = call.request.token as string;
 
-            if(!decoded){
-                throw new Error("invalid token  ");
-            }
+      if (!refreshToken) {
+        return callback(null, { message: "No refresh token provided" });
+      }
 
-            const refresh_token = jwt.sign({id: decoded.id, role: decoded.role}, process.env.REFRESH_TOKEN ||"sribin" as Secret, {
-                expiresIn: "7d"
-            });
+      const decoded = jwt.verify(
+        refreshToken,
+        process.env.REFRESH_TOKEN || "retro-routes"
+      ) as DecodedToken;
 
-            const access_token = jwt.sign({id: decoded.id, role: decoded.role}, process.env.ACCESS_TOKEN ||"sribin"as Secret, {
-                expiresIn: "15m"
-            });
+      if (!decoded || !decoded.role) {
+        return callback(null, { message: "Invalid refresh token" });
+      }
 
-            const response = {access_token, refresh_token}
-            callback(null, response)
-        }catch(e:any){
-            console.log(e);  
-            callback(e, {message:"something gone wrong in authentication"})
-        }
+      const refresh_token = jwt.sign(
+        { clientId: decoded.clientId, role: decoded.role },
+        process.env.REFRESH_TOKEN || "retro-routes",
+        { expiresIn: "7d" }
+      );
+
+      const access_token = jwt.sign(
+        { clientId: decoded.clientId, role: decoded.role },
+        process.env.ACCESS_TOKEN || "retro-routes",
+        { expiresIn: "15m" }
+      );
+
+      console.log("refresh_token",refresh_token);
+      console.log("access_token",access_token);
+      
+    
+      callback(null, { 
+        access_token,
+        refresh_token,
+        message: "",
+      });
+    } catch (error: any) {
+      console.log("Token refresh failed:", error.message);
+      callback(null, { message: "Token refresh failed" });
     }
+  };
 }
