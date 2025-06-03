@@ -3,7 +3,7 @@ import * as grpc from "@grpc/grpc-js";
 import * as protoLoader from "@grpc/proto-loader";
 import "dotenv/config"
 
-import {AuthController}  from "./controller/auth-countroller";
+import {AuthController}  from "./controller/auth-controller";
 
 const authcontroller = new AuthController();
 
